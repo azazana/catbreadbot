@@ -3,6 +3,7 @@
 ![img.png](img.png)
 
 Запуск локально:
+
 Запускаем докер для postgresql:
 
 `docker run -d \
@@ -14,13 +15,27 @@
   -e POSTGRES_DB=telegrambot  \
   postgres:13` 
 
-
+2. Для запуска локально нужно прописать строку подключения в env файле.
+Заходим в докер postgres
 `docker exec -it catbread-postgres-1 bash`
 
-
 `psql -h 127.0.0.1 -U app -d telegrambot` 
+и выполняем последовательно команды из файла bot/fastapi_bot/db/database_bot.ddl
+для создания необходимых таблиц.
 
-python -m pytest tests
-http://0.0.0.0:8000/api/cat_bread_bot/3345/да
+3. Для запуска тестов 
+cd bot/ && python -m pytest tests
 
-Запуск в докер-компоуз
+4. Запуск в докер-компоуз
+
+`docker-compouse build`
+`docker-compouse up`
+
+5. В контейнере выполнить команды по созданию таблиц. 
+`docker exec -it catbread-postgres-1 bash`
+
+`psql -h 127.0.0.1 -U app -d telegrambot`
+Выполняем последовательно команды из файла bot/fastapi_bot/db/database_bot.ddl
+
+6. Запуск тестов в контейнере:
+`cd bot/ && python -m pytest tests`
