@@ -40,7 +40,7 @@ async def welcome(message: Message):
 
 
 @dp.message_handler(regexp='да|aгa|пожалуй|конечно')
-async def yes_cat_handler(message: Message):
+async def yes_cat(message: Message):
     user_id = message.from_id
     text = message.text
 
@@ -53,7 +53,6 @@ async def yes_cat_handler(message: Message):
         await message.answer(answers['cat'])
         connection.set_level(user_id=user_id, level=-1)
     connection.add_message(user_id=user_id, message=text)
-
 
 
 @dp.message_handler(regexp='нет|нет, конечно|ноуп|найн')
