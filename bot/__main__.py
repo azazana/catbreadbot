@@ -1,4 +1,4 @@
-from bot.handlers import cat_bread_bot
+from handlers import cat_bread_bot
 from aiogram.utils import executor
 
 if __name__ == '__main__':

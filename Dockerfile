@@ -9,3 +9,4 @@ COPY . ./code
 
 WORKDIR /code/
 
+CMD python3 /code/bot/__main__.py

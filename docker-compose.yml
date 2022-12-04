@@ -1,0 +1,30 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:13
+    volumes:
+     - $HOME/postgresql/datatel:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+    networks:
+      - network-telegram
+    ports:
+      - 5432:5432
+  backend:
+    build:
+      context: .
+    expose:
+      - 8000
+    networks:
+      - network-telegram
+    depends_on:
+      - postgres
+    env_file:
+      - ./.env
+    restart: always
+networks:
+  network-telegram:
+volumes:
+  postgresql:
+
+
