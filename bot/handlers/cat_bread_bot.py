@@ -12,7 +12,8 @@ bot = Bot(token=os.environ.get('TOKEN'))
 dp = Dispatcher(bot)
 
 logging.basicConfig(level=logging.INFO)
-answers = {'start': 'Привет! Я могу тебе отличить кота от хлеба! Объект перед тобой квадратный?',
+answers = {'start': 'Привет! Я могу тебе отличить кота от хлеба! \
+                    Объект перед тобой квадратный?',
            'cat': 'Это кот а не хлеб! Не ешь его!',
            'bread': 'Это хлеб, а не кот! Ешь его!',
            'ears': 'У него есть уши?',
@@ -28,31 +29,28 @@ dsl = {
 connection = MyPostgres(param=dsl)
 
 
-async def start(message: Message):
-    connection.set_level(user_id=message.from_id, level=0)
-    await message.answer(answers['start'])
-    connection.add_message(user_id=message.from_id, message=message.text)
+def add_message(user_id, message):
+    connection.add_message(user_id, message)
 
 
 @dp.message_handler(commands=['start'])
 async def welcome(message: Message):
-    await start(message)
+    connection.set_level(user_id=message.from_id, level=0)
+    await message.answer(answers['start'])
+    add_message(message.from_id, message.text)
 
 
 @dp.message_handler(regexp='да|aгa|пожалуй|конечно')
 async def yes_cat(message: Message):
-    user_id = message.from_id
-    text = message.text
 
-    level = connection.get_level(user_id=user_id)
-    print(level)
+    level = connection.get_level(user_id=message.from_id)
     if level == 0:
         await message.answer(answers['ears'])
-        connection.set_level(user_id=user_id, level=level + 1)
+        connection.set_level(user_id=message.from_id, level=level + 1)
     elif level > 0:
         await message.answer(answers['cat'])
-        connection.set_level(user_id=user_id, level=-1)
-    connection.add_message(user_id=user_id, message=text)
+        connection.set_level(user_id=message.from_id, level=-1)
+    add_message(message.from_id, message.text)
 
 
 @dp.message_handler(regexp='нет|нет, конечно|ноуп|найн')
@@ -63,4 +61,4 @@ async def no_cat(message: Message):
     elif level > 0:
         await message.answer(answers['bread'])
     connection.set_level(user_id=message.from_id, level=-1)
-    connection.add_message(user_id=message.from_id, message=message.text)
+    add_message(message.from_id, message.text)

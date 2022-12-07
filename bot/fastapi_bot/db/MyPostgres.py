@@ -34,26 +34,29 @@ class MyPostgres(Storage):
     """
 
     def __init__(self, param: dict):
-        self.my_connection = psycopg2.connect(**param, cursor_factory=DictCursor)
+        self.my_connection = psycopg2.connect(**param,
+                                              cursor_factory=DictCursor)
         self.my_cursor = self.my_connection.cursor()
 
-    def _add_information(self, query, user_id, info):
+    def _add_information(self, query, user_id, info: tuple):
         try:
-            self.my_cursor.execute(query, (str(uuid.uuid4()), user_id, info, datetime.utcnow(),))
+            self.my_cursor.execute(query, (str(uuid.uuid4()),
+                                           user_id, *info, datetime.utcnow(),))
         except Exception as err:
-            logger_root.error('Error of downloading data in table. Error %s', err)
+            logger_root.error('Error of downloading data in table. Error %s',
+                              err)
 
     def add_message(self, user_id, message) -> None:
-        query = f'INSERT INTO telegrambot.history VALUES (%s, %s, %s, %s)'
-        self._add_information(query=query, user_id=user_id, info=message)
+        query = 'INSERT INTO telegrambot.history VALUES (%s, %s, %s, %s)'
+        self._add_information(query=query, user_id=user_id, info=(message,))
 
     def set_level(self, user_id, level) -> None:
-        query = f'INSERT INTO telegrambot.level VALUES (%s, %s, %s, %s)'
-        self._add_information(query=query, user_id=user_id, info=level)
+        query = 'INSERT INTO telegrambot.level VALUES (%s, %s, %s, %s)'
+        self._add_information(query=query, user_id=user_id, info=(level,))
 
     def get_level(self, user_id: int) -> int:
-        query = f'SELECT * FROM telegrambot.level  level ' \
-                f'WHERE level.id_user = (%s) ORDER BY created DESC LIMIT 1'
+        query = 'SELECT * FROM telegrambot.level  level ' \
+                'WHERE level.id_user = (%s) ORDER BY created DESC LIMIT 1'
         row = None
         try:
             self.my_cursor.execute(query, (user_id,))
